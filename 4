@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Access Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fc;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #0077cc;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, select, textarea, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .chart-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>Water Access Dashboard</header>
+  <div class="container">
+    <h2>Water Usage Entry</h2>
+    <form id="usageForm">
+      <label for="slum">Select Slum</label>
+      <select id="slum" required>
+        <option value="">-- Select --</option>
+        <option value="Kibera">Kibera</option>
+        <option value="Mathare">Mathare</option>
+        <option value="Mukuru">Mukuru</option>
+      </select>
+
+      <label for="litres">Litres Used</label>
+      <input type="number" id="litres" required />
+
+      <label for="date">Date</label>
+      <input type="date" id="date" required />
+
+      <button type="submit">Submit Usage</button>
+    </form>
+
+    <h3>Usage History</h3>
+    <table id="usageTable">
+      <thead>
+        <tr>
+          <th>Slum</th>
+          <th>Litres</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="chart-container">
+      <canvas id="usageChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const form = document.getElementById("usageForm");
+    const tableBody = document.querySelector("#usageTable tbody");
+    const ctx = document.getElementById("usageChart").getContext("2d");
+
+    let usageData = JSON.parse(localStorage.getItem("usageData")) || [];
+
+    function updateTable() {
+      tableBody.innerHTML = "";
+      usageData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = \`
+          <td>\${row.slum}</td>
+          <td>\${row.litres}</td>
+          <td>\${row.date}</td>
+        \`;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function updateChart() {
+      const grouped = usageData.reduce((acc, item) => {
+        const key = item.slum;
+        acc[key] = (acc[key] || 0) + Number(item.litres);
+        return acc;
+      }, {});
+      const labels = Object.keys(grouped);
+      const data = Object.values(grouped);
+
+      if (window.usageChart) window.usageChart.destroy();
+
+      window.usageChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Total Water Usage (Litres)",
+            data,
+            backgroundColor: ["#3498db", "#2ecc71", "#e67e22"]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const slum = document.getElementById("slum").value;
+      const litres = document.getElementById("litres").value;
+      const date = document.getElementById("date").value;
+
+      const entry = { slum, litres, date };
+      usageData.push(entry);
+      localStorage.setItem("usageData", JSON.stringify(usageData));
+
+      updateTable();
+      updateChart();
+      form.reset();
+    });
+
+    // Initialize on page load
+    updateTable();
+    updateChart();
+  </script>
+</body>
+</html>
