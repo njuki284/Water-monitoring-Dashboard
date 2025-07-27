@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Access Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container" id="loginContainer">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+  </div>
+
+  <div class="dashboard" id="dashboard" style="display: none;">
+    <h1>Water Access Dashboard</h1>
+    <button onclick="logout()">Logout</button>
+
+    <!-- Apply for Connection -->
+    <section>
+      <h2>Apply for New Connection</h2>
+      <form id="connectionForm">
+        <input type="text" placeholder="Full Name" required />
+        <input type="text" placeholder="ID Number" required />
+        <input type="text" placeholder="KRA PIN" required />
+        <input type="text" placeholder="Area" required />
+        <input type="number" placeholder="Number of Households" required />
+        <select required>
+          <option value="">Select Payment Method</option>
+          <option value="mpesa">M-PESA</option>
+          <option value="bank">Bank</option>
+        </select>
+        <input type="text" placeholder="M-PESA Number or Bank Account" required />
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <!-- Water Usage -->
+    <section>
+      <h2>Water Usage Entry</h2>
+      <form id="usageForm">
+        <input type="date" required />
+        <select required>
+          <option value="">Select Slum</option>
+          <option value="kibera">Kibera</option>
+          <option value="mathare">Mathare</option>
+          <option value="mukuru">Mukuru</option>
+        </select>
+        <input type="number" placeholder="Water used in litres" required />
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <!-- Payment -->
+    <section>
+      <h2>Payment</h2>
+      <form id="paymentForm">
+        <input type="text" placeholder="Full Name" required />
+        <input type="text" placeholder="ID Number" required />
+        <select required>
+          <option value="">Select Payment Option</option>
+          <option value="mpesa">M-PESA</option>
+          <option value="bank">Bank</option>
+        </select>
+        <select>
+          <option value="">Choose Bank</option>
+          <option value="kcb">KCB</option>
+          <option value="equity">Equity</option>
+          <option value="coop">Co-op Bank</option>
+        </select>
+        <input type="text" placeholder="M-PESA Number / Bank Account" required />
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #0066cc;
+}
+
+.login-container, .dashboard {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #0066cc;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #004d99;
+}
+
+section {
+  margin-top: 30px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-size: 14px;
+}
+const validUsers = [
+  { username: "admin", password: "1234" },
+  { username: "user", password: "abcd" }
+];
+
+function login() {
+  const uname = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  const error = document.getElementById("loginError");
+
+  const user = validUsers.find(u => u.username === uname && u.password === pass);
+
+  if (user) {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+  } else {
+    error.textContent = "Invalid username or password.";
+  }
+}
+
+function logout() {
+  document.getElementById("loginContainer").style.display = "block";
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("loginError").textContent = "";
+}
